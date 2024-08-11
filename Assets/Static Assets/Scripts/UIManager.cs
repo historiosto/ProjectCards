@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System;
 
 public class UIManager : MonoBehaviour
 {
@@ -57,5 +58,10 @@ public class UIManager : MonoBehaviour
         turnCountText.text = turns.ToString();
         scoreCountText.text = score.ToString();   
 
+    }
+
+    public void UpdateCombo(int comboCount, int comboMultiplier)
+    {
+        Debug.Log("Combo Update : "+comboCount + " " + comboMultiplier);
     }
 }

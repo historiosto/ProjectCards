@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -6,7 +5,6 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     private int score;
-
     private int matches;
     private int turns;
     private int comboMultiplier;
@@ -28,7 +26,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        //StartGame();
+        // StartGame();
     }
 
     public void StartGame()
@@ -38,7 +36,9 @@ public class GameManager : MonoBehaviour
         matches = 0;
         comboMultiplier = 1;
         currentComboCount = 0;
-        UIManager.Instance.InitHUD(score,turns,matches,comboMultiplier,currentComboCount);
+
+        MatchingManager.Instance.InitializeGame(score, comboMultiplier, currentComboCount);
+        UIManager.Instance.InitHUD(score, turns, matches, comboMultiplier, currentComboCount);
         BoardManager.Instance.SetupBoard();
     }
 
@@ -63,40 +63,29 @@ public class GameManager : MonoBehaviour
 
     public void UpdateTurns(int turns)
     {
-        //Save Progress
         this.turns = turns;
         UIManager.Instance.UpdateTurnCount(turns);
     }
 
-     public void UpdateMatches(int matches)
+    public void UpdateMatches(int matches)
     {
-       //Save Progress
-       this.matches = matches;
-       UIManager.Instance.UpdateMatches(matches);
+        this.matches = matches;
+        UIManager.Instance.UpdateMatches(matches);
     }
 
     public void UpdateScore(int newScore)
     {
         score = newScore;
-        
         UIManager.Instance.UpdateScore(score);
         Debug.Log("Score Updated: " + score);
     }
 
-    public void TrackCombo()
+    public void UpdateCombo(int comboCount, int comboMultiplier)
     {
-        comboMultiplier++;
-        currentComboCount++;
-        
-        Debug.Log("Combo Count: " + currentComboCount + " | Multiplier: " + comboMultiplier);
-    }
-
-    public void ResetCombo()
-    {
-        comboMultiplier = 1;
-        currentComboCount = 0;
-       
-        Debug.Log("Combo Reset");
+        this.comboMultiplier = comboMultiplier;
+        this.currentComboCount = comboCount;
+        UIManager.Instance.UpdateCombo(comboCount, comboMultiplier);
+        Debug.Log("Combo Updated: Count = " + comboCount + ", Multiplier = " + comboMultiplier);
     }
 
     public void SaveProgress()
@@ -108,34 +97,33 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetInt("Turns", turns);
         PlayerPrefs.Save();
         Debug.Log("Progress Saved");
-    
     }
 
     public void LoadProgress()
     {
-       
         score = PlayerPrefs.GetInt("Score", 0);
         comboMultiplier = PlayerPrefs.GetInt("ComboMultiplier", 1);
         currentComboCount = PlayerPrefs.GetInt("CurrentComboCount", 0);
         matches = PlayerPrefs.GetInt("Matches", 0);
         turns = PlayerPrefs.GetInt("Turns", 0);
-        UIManager.Instance.InitHUD(score,turns,matches,comboMultiplier,currentComboCount);
+
+        MatchingManager.Instance.InitializeGame(score, comboMultiplier, currentComboCount);
+        UIManager.Instance.InitHUD(score, turns, matches, comboMultiplier, currentComboCount);
 
         Debug.Log("Progress Loaded: Score = " + score + ", ComboMultiplier = " + comboMultiplier + ", CurrentComboCount = " + currentComboCount);
     }
 
-        public void SaveGame()
+    public void SaveGame()
     {
         BoardManager.Instance.SaveBoardState();
-        SaveProgress(); 
+        SaveProgress();
         Debug.Log("Game state saved.");
     }
 
     public void LoadGame()
     {
-        LoadProgress(); 
+        LoadProgress();
         BoardManager.Instance.LoadBoardState();
         Debug.Log("Game state loaded.");
     }
-   
 }

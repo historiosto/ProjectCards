@@ -11,7 +11,8 @@ public class MatchingManager : MonoBehaviour
 
     private Card firstCard;  // First card selected by the player
     private Card secondCard; // Second card selected by the player
-    private int currentCombo; // Tracks the current combo count
+    private int comboMultiplier; // Tracks the combo multiplier
+    private int currentComboCount; // Tracks the current combo count
 
     private void Awake()
     {
@@ -23,6 +24,13 @@ public class MatchingManager : MonoBehaviour
         {
             Instance = this;
         }
+    }
+
+    public void InitializeGame(int initialScore, int initialComboMultiplier, int initialComboCount)
+    {
+        Score = initialScore;
+        comboMultiplier = initialComboMultiplier;
+        currentComboCount = initialComboCount;
     }
 
     public void CardSelected(Card selectedCard)
@@ -57,37 +65,39 @@ public class MatchingManager : MonoBehaviour
     private void HandleMatch()
     {
         Matches++;
-        currentCombo++;
+        currentComboCount++;
+        
+        if(comboMultiplier < 4)
+            comboMultiplier++;
+        
         Score += CalculateScore();
 
         Debug.Log("Match! Score: " + Score);
 
-        // Mark the cards as matched (could also trigger any match animation)
         firstCard.SetMatched();
         secondCard.SetMatched();
 
         // Notify BoardManager about the match
         BoardManager.Instance.CardMatched();
 
-        // Notify GameManager about score and combo
+        // Update UI via GameManager
         GameManager.Instance.UpdateScore(Score);
-        GameManager.Instance.TrackCombo();
+        GameManager.Instance.UpdateCombo(currentComboCount, comboMultiplier);
         GameManager.Instance.UpdateMatches(Matches);
-
 
         ResetTurn();
     }
 
-    public void HandleMismatch()
+    private void HandleMismatch()
     {
         Debug.Log("Mismatch! Resetting combo.");
 
-        currentCombo = 0; // Reset combo on mismatch
+        currentComboCount = 0; 
+        comboMultiplier = 0;
 
         StartCoroutine(WaitThenFlipMismatchCards());
 
-        // Notify GameManager to reset combo
-        GameManager.Instance.ResetCombo();
+        GameManager.Instance.UpdateCombo(currentComboCount, comboMultiplier);
     }
 
     private void ResetTurn()
@@ -99,23 +109,16 @@ public class MatchingManager : MonoBehaviour
     private int CalculateScore()
     {
         int baseScore = 10; // Base score for a match
-        int comboMultiplier = currentCombo; // Multiplier based on current combo
         return baseScore * comboMultiplier;
     }
 
-    public void ResetGame()
+    public void ResetCalculations()
     {
         Turns = 0;
         Matches = 0;
         Score = 0;
-        currentCombo = 1;
-
-        BoardManager.Instance.ResetBoard();
-    }
-
-    public void EndGame()
-    {
-        GameManager.Instance.EndGame();
+        currentComboCount = 0;
+        comboMultiplier = 0;
     }
 
     public IEnumerator WaitThenFlipMismatchCards()

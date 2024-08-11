@@ -129,6 +129,8 @@ public class BoardManager : MonoBehaviour
 
     public void ClearBoard()
     {
+        MatchingManager.Instance.ResetCalculations();
+        
         foreach (Card card in cardsOnBoard)
         {
             
