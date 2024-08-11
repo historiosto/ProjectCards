@@ -12,12 +12,15 @@ public class Card : MonoBehaviour
     public Sprite FrontImage;                     
     public Sprite BackImage;                      
 
+    public AudioSource CardSoundSource;
+
     private bool isFlipped = false;
     public bool IsMatched { get; private set; } 
 
     private Image cardImage; // The UI image component on the card                      
     private Button cardButton;                    
 
+    
     private void Awake()
     {
         cardImage = GetComponent<Image>();
@@ -54,12 +57,15 @@ public class Card : MonoBehaviour
     // This method flips the card
     public IEnumerator FlipCard(bool showFront)
     {
-        yield return new WaitForSeconds(0.15f); //  flip duration
+        CardSoundSource.PlayOneShot(showFront ? Resources.Load<AudioClip>("Sounds/CardFrontSFX") : Resources.Load<AudioClip>("Sounds/CardBackSFX"));
+
+        yield return new WaitForSeconds(0.1f); //  flip duration
 
         // Set the card's image to either the front or back
         cardImage.sprite = showFront ? FrontImage : BackImage;
 
         isFlipped = showFront;
+
     }
 
     public void SetMatched()

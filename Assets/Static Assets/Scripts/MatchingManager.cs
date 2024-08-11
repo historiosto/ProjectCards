@@ -65,22 +65,22 @@ public class MatchingManager : MonoBehaviour
     private void HandleMatch()
     {
         Matches++;
-        currentComboCount++;
-        
-        if(comboMultiplier < 4)
-            comboMultiplier++;
         
         Score += CalculateScore();
 
-        Debug.Log("Match! Score: " + Score);
+        currentComboCount++;
+        //We Increment the ComboMultiplier with every Match!
+        if(comboMultiplier < 4)
+            comboMultiplier++;
+        
 
         firstCard.SetMatched();
         secondCard.SetMatched();
 
-        // Notify BoardManager about the match
+        // We Notify BoardManager about the match
         BoardManager.Instance.CardMatched();
 
-        // Update UI via GameManager
+        // We Update UI via GameManager
         GameManager.Instance.UpdateScore(Score);
         GameManager.Instance.UpdateCombo(currentComboCount, comboMultiplier);
         GameManager.Instance.UpdateMatches(Matches);
@@ -93,7 +93,7 @@ public class MatchingManager : MonoBehaviour
         Debug.Log("Mismatch! Resetting combo.");
 
         currentComboCount = 0; 
-        comboMultiplier = 0;
+        comboMultiplier = 1;
 
         StartCoroutine(WaitThenFlipMismatchCards());
 
@@ -118,7 +118,7 @@ public class MatchingManager : MonoBehaviour
         Matches = 0;
         Score = 0;
         currentComboCount = 0;
-        comboMultiplier = 0;
+        comboMultiplier = 1;
     }
 
     public IEnumerator WaitThenFlipMismatchCards()

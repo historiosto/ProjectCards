@@ -11,6 +11,19 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI matchesCountText;
     public TextMeshProUGUI turnCountText;
 
+    [Space]
+    [Header("Gameplay Messages and Panels")]
+    public TextMeshProUGUI comboMultiplierText;
+    public GameObject gameOverTextObject;
+
+    public GameObject menuPanel;
+
+
+    [Space]
+    [Header("Animators")]
+    public Animator comboTextAnimator;
+    public Animator cardsMatchedTextAnimator;
+    
 
     
     private void Awake()
@@ -25,13 +38,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        
-    }
-
-
-
     public void UpdateScore(int score)
     {
         scoreCountText.text = score.ToString();
@@ -44,16 +50,20 @@ public class UIManager : MonoBehaviour
 
     public void UpdateMatches(int matches)
     {
+        
+        cardsMatchedTextAnimator.SetTrigger("Activate");
         matchesCountText.text = matches.ToString();   
     }
 
     public void ShowEndGameUI()
     {
-
+        menuPanel.SetActive(true);
+        gameOverTextObject.SetActive(true);
     }
 
-    public void InitHUD(int score, int turns, int matches, int comboMultiplier, int currentComboCount)
+    public void InitUI(int score, int turns, int matches, int comboMultiplier, int currentComboCount)
     {
+        comboTextAnimator.SetBool("Activated",false);
         matchesCountText.text = matches.ToString();
         turnCountText.text = turns.ToString();
         scoreCountText.text = score.ToString();   
@@ -62,6 +72,11 @@ public class UIManager : MonoBehaviour
 
     public void UpdateCombo(int comboCount, int comboMultiplier)
     {
-        Debug.Log("Combo Update : "+comboCount + " " + comboMultiplier);
+        comboMultiplierText.text = "x"+comboMultiplier.ToString();
+
+
+        comboTextAnimator.SetBool("Activated",comboMultiplier > 1);
+        
+
     }
 }

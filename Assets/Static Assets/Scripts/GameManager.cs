@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
         currentComboCount = 0;
 
         MatchingManager.Instance.InitializeGame(score, comboMultiplier, currentComboCount);
-        UIManager.Instance.InitHUD(score, turns, matches, comboMultiplier, currentComboCount);
+        UIManager.Instance.InitUI(score, turns, matches, comboMultiplier, currentComboCount);
         BoardManager.Instance.SetupBoard();
     }
 
@@ -108,7 +108,7 @@ public class GameManager : MonoBehaviour
         turns = PlayerPrefs.GetInt("Turns", 0);
 
         MatchingManager.Instance.InitializeGame(score, comboMultiplier, currentComboCount);
-        UIManager.Instance.InitHUD(score, turns, matches, comboMultiplier, currentComboCount);
+        UIManager.Instance.InitUI(score, turns, matches, comboMultiplier, currentComboCount);
 
         Debug.Log("Progress Loaded: Score = " + score + ", ComboMultiplier = " + comboMultiplier + ", CurrentComboCount = " + currentComboCount);
     }
