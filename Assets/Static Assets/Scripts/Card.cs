@@ -2,24 +2,18 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CardUtility : MonoBehaviour
-{
-    public static string GetRandomSuit()
-    {
-        string[] suits = { "clubs", "diamonds", "hearts", "spades" };
-        int randomIndex = Random.Range(0, suits.Length);
-        return suits[randomIndex];
-    }
-}
 
 public class Card : MonoBehaviour
 {
     public int ReferenceID { get; private set; }  // Unique identifier for the card to match with others
+
+    public string cardSuit;
+
     public Sprite FrontImage;                     
     public Sprite BackImage;                      
 
     private bool isFlipped = false;
-    private bool isMatched = false;
+    public bool IsMatched { get; private set; } 
 
     private Image cardImage; // The UI image component on the card                      
     private Button cardButton;                    
@@ -33,11 +27,20 @@ public class Card : MonoBehaviour
        
     }
 
+    private void Start()
+    {
+
+        if(IsMatched)
+        {
+            StartCoroutine(FlipCard(true));
+        }
+    }
+
     public void OnCardClicked()
     {
         Debug.Log("Card Clicked!");
 
-        if (isFlipped || isMatched || InteractionManager.Instance == null) return;
+        if (isFlipped || IsMatched || InteractionManager.Instance == null) return;
 
         if(InteractionManager.Instance.isInputLocked) return;
 
@@ -61,7 +64,7 @@ public class Card : MonoBehaviour
 
     public void SetMatched()
     {
-        isMatched = true;
+        IsMatched = true;
 
         // animation here 
         // sound effect
@@ -74,7 +77,7 @@ public class Card : MonoBehaviour
     public void ResetCard()
     {
         isFlipped = false;
-        isMatched = false;
+        IsMatched = false;
 
         cardImage.sprite = BackImage;
 
@@ -85,6 +88,7 @@ public class Card : MonoBehaviour
     public void SetReferenceID(int id, string suit)
     {
         ReferenceID = id;
+        cardSuit = suit;
 
         string cardName = GetCardName(ReferenceID) + "_of_" + suit;
         string path = "Cards/" + cardName; 
@@ -111,6 +115,13 @@ public class Card : MonoBehaviour
             case 13: return "king";
             default: return cardNumber.ToString();  // Returns "2" to "10"
         }
+    }
+
+     public static string GetRandomSuit()
+    {
+        string[] suits = { "clubs", "diamonds", "hearts", "spades" };
+        int randomIndex = Random.Range(0, suits.Length);
+        return suits[randomIndex];
     }
     
 }

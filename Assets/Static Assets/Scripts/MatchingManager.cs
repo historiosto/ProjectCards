@@ -75,7 +75,6 @@ public class MatchingManager : MonoBehaviour
         GameManager.Instance.UpdateMatches(Matches);
 
 
-        // Reset for the next turn
         ResetTurn();
     }
 
@@ -116,7 +115,6 @@ public class MatchingManager : MonoBehaviour
 
     public void EndGame()
     {
-        // Handle end-of-game logic 
         GameManager.Instance.EndGame();
     }
 

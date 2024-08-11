@@ -28,30 +28,36 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // Initialize game state
-        StartGame();
+        //StartGame();
     }
 
     public void StartGame()
     {
-        // Reset game and combo state
-        LoadProgress(); // Load the saved progress (score and combo)
-
+        score = 0;
+        turns = 0;
+        matches = 0;
+        comboMultiplier = 1;
+        currentComboCount = 0;
         UIManager.Instance.InitHUD(score,turns,matches,comboMultiplier,currentComboCount);
         BoardManager.Instance.SetupBoard();
     }
 
     public void EndGame()
     {
-        // End the game and handle saving scores
-        SaveProgress();
         UIManager.Instance.ShowEndGameUI();
     }
 
     public void RestartGame()
     {
-        // Reset game state and restart
-        // & Dekelete Progress
+        StartGame();
+    }
+
+    public void DeleteSavesAndRestart()
+    {
+        PlayerPrefs.DeleteAll();
+
+        BoardManager.Instance.ClearBoard();
+
         StartGame();
     }
 
@@ -72,7 +78,7 @@ public class GameManager : MonoBehaviour
     public void UpdateScore(int newScore)
     {
         score = newScore;
-        SaveProgress(); // Save progress wheneever the score is updated
+        
         UIManager.Instance.UpdateScore(score);
         Debug.Log("Score Updated: " + score);
     }
@@ -81,7 +87,7 @@ public class GameManager : MonoBehaviour
     {
         comboMultiplier++;
         currentComboCount++;
-        SaveProgress(); // Save progress whenever the combo changes
+        
         Debug.Log("Combo Count: " + currentComboCount + " | Multiplier: " + comboMultiplier);
     }
 
@@ -89,35 +95,47 @@ public class GameManager : MonoBehaviour
     {
         comboMultiplier = 1;
         currentComboCount = 0;
-        SaveProgress(); // Save progress when the combo is reset
+       
         Debug.Log("Combo Reset");
-    }
-
-    private void Update()
-    {
-        // Any logic that needs to run every frame, such as handling combo timeouts
     }
 
     public void SaveProgress()
     {
-        // Logic for saving progress and score, e.g., using PlayerPrefs or a file system
-      //  PlayerPrefs.SetInt("Score", score);
-      //  PlayerPrefs.SetInt("ComboMultiplier", comboMultiplier);
-      //  PlayerPrefs.SetInt("CurrentComboCount", currentComboCount);
-      //  PlayerPrefs.Save();
+        PlayerPrefs.SetInt("Score", score);
+        PlayerPrefs.SetInt("ComboMultiplier", comboMultiplier);
+        PlayerPrefs.SetInt("CurrentComboCount", currentComboCount);
+        PlayerPrefs.SetInt("Matches", matches);
+        PlayerPrefs.SetInt("Turns", turns);
+        PlayerPrefs.Save();
         Debug.Log("Progress Saved");
+    
     }
 
     public void LoadProgress()
     {
-        // Logic for loading progress and score
+       
         score = PlayerPrefs.GetInt("Score", 0);
         comboMultiplier = PlayerPrefs.GetInt("ComboMultiplier", 1);
         currentComboCount = PlayerPrefs.GetInt("CurrentComboCount", 0);
         matches = PlayerPrefs.GetInt("Matches", 0);
         turns = PlayerPrefs.GetInt("Turns", 0);
+        UIManager.Instance.InitHUD(score,turns,matches,comboMultiplier,currentComboCount);
+
         Debug.Log("Progress Loaded: Score = " + score + ", ComboMultiplier = " + comboMultiplier + ", CurrentComboCount = " + currentComboCount);
     }
 
+        public void SaveGame()
+    {
+        BoardManager.Instance.SaveBoardState();
+        SaveProgress(); 
+        Debug.Log("Game state saved.");
+    }
+
+    public void LoadGame()
+    {
+        LoadProgress(); 
+        BoardManager.Instance.LoadBoardState();
+        Debug.Log("Game state loaded.");
+    }
    
 }
