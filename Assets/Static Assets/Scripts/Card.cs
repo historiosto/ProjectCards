@@ -2,6 +2,16 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+public class CardUtility : MonoBehaviour
+{
+    public static string GetRandomSuit()
+    {
+        string[] suits = { "clubs", "diamonds", "hearts", "spades" };
+        int randomIndex = Random.Range(0, suits.Length);
+        return suits[randomIndex];
+    }
+}
+
 public class Card : MonoBehaviour
 {
     public int ReferenceID { get; private set; }  // Unique identifier for the card to match with others
@@ -72,12 +82,35 @@ public class Card : MonoBehaviour
         cardButton.interactable = true;
     }
 
-    public void SetReferenceID(int id)
+    public void SetReferenceID(int id, string suit)
     {
         ReferenceID = id;
+
+        string cardName = GetCardName(ReferenceID) + "_of_" + suit;
+        string path = "Cards/" + cardName; 
+        Sprite cardSprite = Resources.Load<Sprite>(path);
+
+        if (cardSprite != null)
+        {
+            FrontImage = cardSprite;
+        }
+        else
+        {
+            Debug.LogError("Card image not found: " + path);
+        }
     }
 
   
-
+    private string GetCardName(int cardNumber)
+    {
+        switch (cardNumber)
+        {
+            case 1: return "ace";
+            case 11: return "jack";
+            case 12: return "queen";
+            case 13: return "king";
+            default: return cardNumber.ToString();  // Returns "2" to "10"
+        }
+    }
     
 }

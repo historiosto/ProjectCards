@@ -57,21 +57,22 @@ public class BoardManager : MonoBehaviour
         }
 
 
-        // Instantiate the cards and add them to the grid
-        for (int i = 0; i < totalCards; i++)
+       for (int i = 0; i < totalCards; i += 2)
         {
-            GameObject newCard = Instantiate(CardPrefab, cardboard.transform);
-            Card cardComponent = newCard.GetComponent<Card>();
-            cardsOnBoard.Add(cardComponent);
-            int referenceID = i / 2;
-            cardComponent.SetReferenceID(referenceID);
-            
-            // Initialize the card (set reference ID, image, etc.)
-            //cardComponent.InitializeCard(i % (Columns * Rows / 2)); 
+            // Generate a new suit for each pair
+            string cardSuit = CardUtility.GetRandomSuit();
+
+            for (int j = 0; j < 2; j++)
+            {
+                GameObject newCard = Instantiate(CardPrefab, cardboard.transform);
+                Card cardComponent = newCard.GetComponent<Card>();
+                cardsOnBoard.Add(cardComponent);
+
+                int referenceID = i / 2; 
+                cardComponent.SetReferenceID(referenceID+1, cardSuit);
+            }
         }
-     
-       
-        // Notify other systems that the board is ready
+
 
         ShuffleCards();
 

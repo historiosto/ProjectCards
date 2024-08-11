@@ -36,6 +36,8 @@ public class MatchingManager : MonoBehaviour
             secondCard = selectedCard;
             Turns++;
 
+            GameManager.Instance.UpdateTurns(Turns);
+
             CheckForMatch();
         }
     }
@@ -58,7 +60,7 @@ public class MatchingManager : MonoBehaviour
         currentCombo++;
         Score += CalculateScore();
 
-        Debug.Log("Match !");
+        Debug.Log("Match! Score: " + Score);
 
         // Mark the cards as matched (could also trigger any match animation)
         firstCard.SetMatched();
@@ -67,22 +69,27 @@ public class MatchingManager : MonoBehaviour
         // Notify BoardManager about the match
         BoardManager.Instance.CardMatched();
 
+        // Notify GameManager about score and combo
+        GameManager.Instance.UpdateScore(Score);
+        GameManager.Instance.TrackCombo();
+        GameManager.Instance.UpdateMatches(Matches);
+
+
         // Reset for the next turn
         ResetTurn();
-
     }
 
     public void HandleMismatch()
     {
-
-        Debug.Log("MisMatch! , Reset");
+        Debug.Log("Mismatch! Resetting combo.");
 
         currentCombo = 0; // Reset combo on mismatch
 
         StartCoroutine(WaitThenFlipMismatchCards());
 
+        // Notify GameManager to reset combo
+        GameManager.Instance.ResetCombo();
     }
-
 
     private void ResetTurn()
     {
@@ -102,7 +109,7 @@ public class MatchingManager : MonoBehaviour
         Turns = 0;
         Matches = 0;
         Score = 0;
-        currentCombo = 0;
+        currentCombo = 1;
 
         BoardManager.Instance.ResetBoard();
     }
@@ -120,6 +127,5 @@ public class MatchingManager : MonoBehaviour
         StartCoroutine(firstCard.FlipCard(false));
         StartCoroutine(secondCard.FlipCard(false));
         ResetTurn();
-
     }
 }

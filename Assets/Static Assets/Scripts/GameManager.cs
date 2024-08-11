@@ -1,18 +1,16 @@
+using System;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    // Game State Variables
     private int score;
+
+    private int matches;
+    private int turns;
     private int comboMultiplier;
     private int currentComboCount;
-
-    // Combo System Variables
-    private float comboTimer;
-    private const float comboDuration = 5.0f;  // Time window to continue a combo
-    private bool isComboActive;
 
     private void Awake()
     {
@@ -37,76 +35,76 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         // Reset game and combo state
-        score = 0;
-        comboMultiplier = 1;
-        currentComboCount = 0;
-        isComboActive = false;
+        LoadProgress(); // Load the saved progress (score and combo)
 
-        // Initialize other game components
-        // E.g., BoardManager.Instance.SetupBoard();
+        UIManager.Instance.InitHUD(score,turns,matches,comboMultiplier,currentComboCount);
+        BoardManager.Instance.SetupBoard();
     }
 
     public void EndGame()
     {
         // End the game and handle saving scores
         SaveProgress();
-        // Additional end game logic, e.g., show game over screen
+        UIManager.Instance.ShowEndGameUI();
     }
 
     public void RestartGame()
     {
         // Reset game state and restart
+        // & Dekelete Progress
         StartGame();
     }
 
-    public void UpdateScore(int basePoints)
+    public void UpdateTurns(int turns)
     {
-        // Calculate score with combo multiplier
-        int pointsEarned = basePoints * comboMultiplier;
-        score += pointsEarned;
+        //Save Progress
+        this.turns = turns;
+        UIManager.Instance.UpdateTurnCount(turns);
+    }
+
+     public void UpdateMatches(int matches)
+    {
+       //Save Progress
+       this.matches = matches;
+       UIManager.Instance.UpdateMatches(matches);
+    }
+
+    public void UpdateScore(int newScore)
+    {
+        score = newScore;
+        SaveProgress(); // Save progress wheneever the score is updated
+        UIManager.Instance.UpdateScore(score);
         Debug.Log("Score Updated: " + score);
     }
 
     public void TrackCombo()
     {
-        if (!isComboActive)
-        {
-            isComboActive = true;
-            comboTimer = comboDuration;
-        }
-        else
-        {
-            comboMultiplier++;
-            currentComboCount++;
-            Debug.Log("Combo Count: " + currentComboCount + " | Multiplier: " + comboMultiplier);
-        }
+        comboMultiplier++;
+        currentComboCount++;
+        SaveProgress(); // Save progress whenever the combo changes
+        Debug.Log("Combo Count: " + currentComboCount + " | Multiplier: " + comboMultiplier);
     }
 
     public void ResetCombo()
     {
-        isComboActive = false;
         comboMultiplier = 1;
         currentComboCount = 0;
+        SaveProgress(); // Save progress when the combo is reset
         Debug.Log("Combo Reset");
     }
 
     private void Update()
     {
-        if (isComboActive)
-        {
-            comboTimer -= Time.deltaTime;
-            if (comboTimer <= 0)
-            {
-                ResetCombo();
-            }
-        }
+        // Any logic that needs to run every frame, such as handling combo timeouts
     }
 
     public void SaveProgress()
     {
         // Logic for saving progress and score, e.g., using PlayerPrefs or a file system
-        PlayerPrefs.SetInt("Score", score);
-        PlayerPrefs.Save();
+      //  PlayerPrefs.SetInt("Score", score);
+      //  PlayerPrefs.SetInt("ComboMultiplier", comboMultiplier);
+      //  PlayerPrefs.SetInt("CurrentComboCount", currentComboCount);
+      //  PlayerPrefs.Save();
         Debug.Log("Progress Saved");
     }
 
@@ -114,6 +112,12 @@ public class GameManager : MonoBehaviour
     {
         // Logic for loading progress and score
         score = PlayerPrefs.GetInt("Score", 0);
-        Debug.Log("Progress Loaded: Score = " + score);
+        comboMultiplier = PlayerPrefs.GetInt("ComboMultiplier", 1);
+        currentComboCount = PlayerPrefs.GetInt("CurrentComboCount", 0);
+        matches = PlayerPrefs.GetInt("Matches", 0);
+        turns = PlayerPrefs.GetInt("Turns", 0);
+        Debug.Log("Progress Loaded: Score = " + score + ", ComboMultiplier = " + comboMultiplier + ", CurrentComboCount = " + currentComboCount);
     }
+
+   
 }
