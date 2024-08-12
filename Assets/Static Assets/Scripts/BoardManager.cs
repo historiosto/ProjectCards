@@ -6,7 +6,10 @@ public class BoardManager : MonoBehaviour
 {
     public static BoardManager Instance { get; private set; }
 
+    [SerializeField, Range(2, 6)]
     public int Columns = 4;
+
+    [SerializeField, Range(2, 4)]
     public int Rows = 4;
     public GameObject CardPrefab;
     public GameObject cardboard;
@@ -130,7 +133,7 @@ public class BoardManager : MonoBehaviour
     public void ClearBoard()
     {
         MatchingManager.Instance.ResetCalculations();
-        
+
         foreach (Card card in cardsOnBoard)
         {
             

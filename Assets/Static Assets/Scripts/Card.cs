@@ -72,8 +72,7 @@ public class Card : MonoBehaviour
     {
         IsMatched = true;
 
-        // animation here 
-        // sound effect
+        GetComponent<Animator>().SetTrigger("Matched");
 
         // Disable the card's button to prevent further interaction
         cardButton.interactable = false;
