@@ -1,6 +1,8 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class MatchingManager : MonoBehaviour
 {
     public static MatchingManager Instance { get; private set; }
@@ -8,6 +10,10 @@ public class MatchingManager : MonoBehaviour
     public int Turns { get; private set; }
     public int Matches { get; private set; }
     public int Score { get; private set; }
+
+    public List<AudioClip> ComboSounds = new List<AudioClip>();
+
+    private AudioSource matchingCardsAudioSource;
 
     private Card firstCard;  // First card selected by the player
     private Card secondCard; // Second card selected by the player
@@ -24,6 +30,8 @@ public class MatchingManager : MonoBehaviour
         {
             Instance = this;
         }
+
+        matchingCardsAudioSource = GetComponent<AudioSource>();
     }
 
     public void InitializeGame(int initialScore, int initialComboMultiplier, int initialComboCount)
@@ -69,6 +77,11 @@ public class MatchingManager : MonoBehaviour
         Score += CalculateScore();
 
         currentComboCount++;
+
+
+       
+
+
         //We Increment the ComboMultiplier with every Match!
         if(comboMultiplier < 4)
             comboMultiplier++;
@@ -84,6 +97,8 @@ public class MatchingManager : MonoBehaviour
         GameManager.Instance.UpdateScore(Score);
         GameManager.Instance.UpdateCombo(currentComboCount, comboMultiplier);
         GameManager.Instance.UpdateMatches(Matches);
+
+        PlaySound();
 
         ResetTurn();
     }
@@ -128,5 +143,34 @@ public class MatchingManager : MonoBehaviour
         StartCoroutine(firstCard.FlipCard(false));
         StartCoroutine(secondCard.FlipCard(false));
         ResetTurn();
+    }
+
+
+    private void PlaySound()
+    {
+        try
+        {
+             switch (currentComboCount)
+            {
+                case 1:
+                    matchingCardsAudioSource.PlayOneShot(ComboSounds[0]);
+                    break;
+                case 2:
+                    matchingCardsAudioSource.PlayOneShot(ComboSounds[1]);
+                    break;
+                default:
+                    if (currentComboCount > 2)
+                    {
+                        matchingCardsAudioSource.PlayOneShot(ComboSounds[2]);
+                    }
+                break;
+            }
+        }
+        catch (System.Exception e)
+        {
+            
+            Debug.LogWarning("" + e.Message);
+        }
+       
     }
 }
